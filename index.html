@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NZZ News Stories - HD Pro</title>
+    <title>NZZ News Stories - Ultra HD</title>
     <style>
         :root {
             --bg-color: #030914;
@@ -173,7 +173,6 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            image-rendering: -webkit-optimize-contrast;
         }
 
         /* Dunkler Verlauf nach unten */
@@ -187,7 +186,7 @@
             background: linear-gradient(to bottom, transparent, var(--bg-color));
         }
 
-        /* Text-Bereich (Schiebt den Inhalt um 10% nach oben) */
+        /* Text-Bereich mit 10% Abstand unten */
         .content-container {
             flex: 1;
             padding: 4% 6% 0 6%; 
@@ -195,7 +194,7 @@
             flex-direction: column;
             justify-content: flex-start;
             background-color: var(--bg-color);
-            margin-bottom: 10vh; /* Erzwingt 10% freien, dunklen Raum am unteren Bildschirmrand */
+            margin-bottom: 10vh; 
         }
 
         .ticker-badge {
@@ -268,7 +267,6 @@
     </div>
 
     <script>
-        // Fängt Fehler ab und gibt sie visuell aus statt abzustürzen
         window.onerror = function(msg, url, line) {
             const errorDiv = document.getElementById('error-debug');
             if (errorDiv) {
@@ -357,12 +355,12 @@
                     }
                 }
 
-                // FEHLERFREIES HD-UPGRADE MIT PROPORTIONALER 16:9 ANPASSUNG
+                // RADIKALE ULTRA-HD UPGRADE LOGIK
                 if (imageUrl && imageUrl.includes('img.nzz.ch')) {
-                    // Ersetzt bestehende Maße sauber durch ein scharfes HD-Format (1200x675)
-                    imageUrl = imageUrl.replace(/width=\d+/gi, 'width=1200');
-                    imageUrl = imageUrl.replace(/height=\d+/gi, 'height=675');
-                    imageUrl = imageUrl.replace(/quality=\d+/gi, 'quality=85');
+                    // Wir schneiden alle alten, verkleinernden Parameter (?width=560 etc.) komplett ab
+                    const baseUrl = imageUrl.split('?')[0];
+                    // Wir erzwingen ein absolut gestochen scharfes 16:9 Format mit hoher Qualität
+                    imageUrl = `${baseUrl}?width=1600&height=900&quality=90`;
                 }
 
                 if (!imageUrl) {
