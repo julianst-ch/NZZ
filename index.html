@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NZZ News Stories - Full HD 9:16 (Ultra HD & Shifted Up)</title>
+    <title>NZZ News Stories - HD Pro</title>
     <style>
         :root {
             --bg-color: #030914;
@@ -173,7 +173,6 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            /* Aktiviert die schärfere Skalierung ohne Überschreibung */
             image-rendering: -webkit-optimize-contrast;
         }
 
@@ -188,14 +187,15 @@
             background: linear-gradient(to bottom, transparent, var(--bg-color));
         }
 
-        /* Text-Bereich (Um 10% nach oben geschoben durch 12vh Padding unten) */
+        /* Text-Bereich (Schiebt den Inhalt um 10% nach oben) */
         .content-container {
             flex: 1;
-            padding: 4% 6% 12vh 6%; 
+            padding: 4% 6% 0 6%; 
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
             background-color: var(--bg-color);
+            margin-bottom: 10vh; /* Erzwingt 10% freien, dunklen Raum am unteren Bildschirmrand */
         }
 
         .ticker-badge {
@@ -245,6 +245,8 @@
 </head>
 <body>
 
+    <div id="error-debug" style="position: absolute; top: 0; left: 0; right: 0; background: rgba(220, 20, 60, 0.95); color: white; padding: 15px; z-index: 99999; font-family: monospace; font-size: 13px; display: none; word-break: break-all; text-align: left;"></div>
+
     <div class="story-wrapper">
         <div class="loader" id="loader">Lade Nachrichten...<br><span style="font-size:0.8rem; opacity:0.5;">Verbinde mit NZZ Feed...</span></div>
         
@@ -266,6 +268,16 @@
     </div>
 
     <script>
+        // Fängt Fehler ab und gibt sie visuell aus statt abzustürzen
+        window.onerror = function(msg, url, line) {
+            const errorDiv = document.getElementById('error-debug');
+            if (errorDiv) {
+                errorDiv.style.display = 'block';
+                errorDiv.innerText = "Fehler im Code erkannt:\n\n" + msg + "\nZeile: " + line;
+            }
+            return false;
+        };
+
         const RSS_URL = 'https://www.nzz.ch/recent.rss';
         const STORY_DURATION = 7000;
 
@@ -345,26 +357,12 @@
                     }
                 }
 
-                // RADIKALES HD-UPGRADE MIT PARAMETER-BEREINIGUNG
+                // FEHLERFREIES HD-UPGRADE MIT PROPORTIONALER 16:9 ANPASSUNG
                 if (imageUrl && imageUrl.includes('img.nzz.ch')) {
-                    try {
-                        const urlObj = new URL(imageUrl);
-                        // Erzwinge maximale Full-HD Breite & hohe Qualität
-                        urlObj.searchParams.set('width', '1920');
-                        urlObj.searchParams.set('quality', '90');
-                        // LÖSCHT die alte Höhenbegrenzung komplett, damit der CDN-Server frei skaliert!
-                        urlObj.searchParams.delete('height');
-                        imageUrl = urlObj.toString();
-                    } catch (e) {
-                        // Regex Fallback falls URL() fehlschlägt
-                        imageUrl = imageUrl.replace(/([\?&]width=)\d+/i, '$11920');
-                        imageUrl = imageUrl.replace(/([\?&]height=)\d+/i, '');
-                        if (imageUrl.match(/([\?&]quality=)\d+/i)) {
-                            imageUrl = imageUrl.replace(/([\?&]quality=)\d+/i, '$190');
-                        } else {
-                            imageUrl += '&quality=90';
-                        }
-                    }
+                    // Ersetzt bestehende Maße sauber durch ein scharfes HD-Format (1200x675)
+                    imageUrl = imageUrl.replace(/width=\d+/gi, 'width=1200');
+                    imageUrl = imageUrl.replace(/height=\d+/gi, 'height=675');
+                    imageUrl = imageUrl.replace(/quality=\d+/gi, 'quality=85');
                 }
 
                 if (!imageUrl) {
