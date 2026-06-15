@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NZZ News Stories</title>
+    <title>NZZ News Stories - Full HD 9:16</title>
     <style>
         :root {
             --bg-color: #030914;
@@ -27,46 +27,42 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            width: 100vw;
+            height: 100vh;
             overflow: hidden;
         }
 
+        /* Strict 9:16 Canvas optimized for Full HD and scaled displays */
         .story-wrapper {
-            width: 100%;
-            max-width: 430px;
-            height: 100vh;
-            max-height: 932px;
-            background-color: var(--bg-color);
             position: relative;
+            width: 100vw;
+            height: 100vh;
+            max-width: calc(100vh * 9 / 16);
+            max-height: calc(100vw * 16 / 9);
+            aspect-ratio: 9 / 16;
+            background-color: var(--bg-color);
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            box-shadow: 0 0 20px rgba(0,0,0,0.8);
-        }
-
-        @media (min-width: 440px) {
-            .story-wrapper {
-                border-radius: 16px;
-                height: 85vh;
-            }
+            box-shadow: 0 0 40px rgba(0,0,0,0.85);
         }
 
         /* Top Progress Bars */
         .progress-container {
             position: absolute;
-            top: 12px;
+            top: 2vh;
             left: 0;
             right: 0;
             display: flex;
-            padding: 0 12px;
-            gap: 4px;
+            padding: 0 4%;
+            gap: 6px;
             z-index: 10;
         }
 
         .progress-bar {
-            height: 2px;
+            height: 3px;
             flex: 1;
-            background-color: rgba(255, 255, 255, 0.3);
+            background-color: rgba(255, 255, 255, 0.25);
             border-radius: 2px;
             overflow: hidden;
             position: relative;
@@ -78,29 +74,26 @@
             background-color: #fff;
         }
 
-        .progress-bar.seen .progress-fill {
-            width: 100%;
-        }
-
         /* Top Header Metadata */
         .story-header {
             position: absolute;
-            top: 24px;
+            top: 4vh;
             left: 0;
             right: 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 16px;
+            padding: 0 5%;
             z-index: 10;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
         }
 
         .meta-info {
             display: flex;
             align-items: center;
-            font-size: 14px;
+            font-size: 1.2rem;
             font-weight: 600;
+            letter-spacing: 0.5px;
         }
 
         .category {
@@ -109,19 +102,20 @@
 
         .time-ago {
             color: var(--text-muted);
-            margin-left: 6px;
+            margin-left: 8px;
         }
 
         .close-btn {
             background: none;
             border: none;
             color: #fff;
-            font-size: 24px;
+            font-size: 2rem;
             cursor: pointer;
-            opacity: 0.8;
+            opacity: 0.7;
+            line-height: 1;
         }
 
-        /* Invisible Navigation Touch Zones */
+        /* Navigation Taps Layer */
         .nav-zones {
             position: absolute;
             top: 0;
@@ -133,16 +127,16 @@
         }
 
         .zone-left {
-            width: 30%;
+            width: 33%;
             height: 100%;
         }
 
         .zone-right {
-            width: 70%;
+            width: 67%;
             height: 100%;
         }
 
-        /* Main Story Slides Area */
+        /* Main Slides Canvas */
         .slides-container {
             width: 100%;
             height: 100%;
@@ -157,7 +151,7 @@
             height: 100%;
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.4s ease-in-out;
             display: flex;
             flex-direction: column;
         }
@@ -167,10 +161,10 @@
             visibility: visible;
         }
 
-        /* Image Section */
+        /* Visual Imagery Layer */
         .image-container {
             width: 100%;
-            height: 55%;
+            height: 58%;
             position: relative;
             background-color: #000;
         }
@@ -181,20 +175,21 @@
             object-fit: cover;
         }
 
+        /* Ambient background dark fade matrix */
         .image-container::after {
             content: '';
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 80px;
+            height: 120px;
             background: linear-gradient(to bottom, transparent, var(--bg-color));
         }
 
-        /* Text Content Area */
+        /* Text Presentation Matrix */
         .content-container {
             flex: 1;
-            padding: 20px 24px 40px 24px;
+            padding: 4% 6% 8% 6%;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
@@ -203,34 +198,34 @@
 
         .ticker-badge {
             align-self: flex-start;
-            font-size: 11px;
+            font-size: 0.85rem;
             text-transform: uppercase;
             font-weight: 800;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             color: var(--accent-blue);
-            margin-bottom: 12px;
+            margin-bottom: 3%;
         }
 
         .story-title {
             font-family: Georgia, serif;
-            font-size: 24px;
-            line-height: 1.3;
+            font-size: 1.95rem;
+            line-height: 1.35;
             font-weight: 600;
-            margin-bottom: 16px;
+            margin-bottom: 4%;
             color: var(--text-color);
         }
 
         .story-description {
-            font-size: 15px;
-            line-height: 1.6;
+            font-size: 1.15rem;
+            line-height: 1.65;
             color: var(--text-muted);
-            margin-bottom: 16px;
         }
 
         .story-author {
-            font-size: 13px;
+            font-size: 0.95rem;
             color: var(--text-muted);
             margin-top: auto;
+            padding-top: 15px;
         }
 
         /* Loading Spinner */
@@ -239,7 +234,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 16px;
+            font-size: 1.2rem;
             color: var(--text-muted);
             z-index: 20;
         }
@@ -250,7 +245,7 @@
     <div class="story-wrapper">
         <div class="loader" id="loader">Lade Nachrichten...</div>
         
-        <!-- Top components -->
+        <!-- Overhead Display Framework -->
         <div class="progress-container" id="progressContainer"></div>
         <div class="story-header" id="storyHeader" style="display: none;">
             <div class="meta-info">
@@ -260,13 +255,13 @@
             <button class="close-btn">&times;</button>
         </div>
 
-        <!-- Navigation Invisible Taps -->
+        <!-- Direct Input Triggers -->
         <div class="nav-zones">
             <div class="zone-left" id="zoneLeft"></div>
             <div class="zone-right" id="zoneRight"></div>
         </div>
 
-        <!-- Main Body Slides -->
+        <!-- Render Target Frame Container -->
         <div class="slides-container" id="slidesContainer"></div>
     </div>
 
@@ -288,44 +283,37 @@
                 const xmlDoc = parser.parseFromString(data.contents, "text/xml");
                 const items = xmlDoc.querySelectorAll("item");
                 
-                stories = Array.from(items).slice(0, 12).map(item => {
+                stories = Array.from(items).slice(0, 15).map(item => {
                     const title = item.querySelector('title')?.textContent || '';
                     const rawDescription = item.querySelector('description')?.textContent || '';
-                    const link = item.querySelector('link')?.textContent || '#';
                     const pubDate = item.querySelector('pubDate')?.textContent || '';
                     const category = item.querySelector('category')?.textContent || 'International';
                     const creator = item.getElementsByTagName('dc:creator')[0]?.textContent || '';
 
-                    // 1. Robust Image Parsing Logic specifically for NZZ structure
+                    // High efficiency NZZ image parsing routine
                     let imageUrl = '';
-                    
-                    // Check <enclosure> tags
                     const enclosure = item.querySelector('enclosure');
                     if (enclosure && enclosure.getAttribute('type')?.includes('image')) {
                         imageUrl = enclosure.getAttribute('url');
                     }
                     
-                    // Check <media:content> tags
                     if (!imageUrl) {
                         const mediaContent = item.getElementsByTagName('media:content')[0];
                         if (mediaContent) imageUrl = mediaContent.getAttribute('url');
                     }
 
-                    // Extract <img> from description content if nested in CDATA HTML
                     if (!imageUrl) {
                         const imgMatch = rawDescription.match(/<img[^>]+src="([^">]+)"/);
                         if (imgMatch && imgMatch[1]) imageUrl = imgMatch[1];
                     }
 
-                    // Fallback high quality asset if no image is present
                     if (!imageUrl) {
-                        imageUrl = 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=600';
+                        imageUrl = 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800';
                     }
 
-                    // 2. Clean up raw description text from any embedded HTML nodes
+                    // Content node sanitizer
                     const tempDiv = document.createElement('div');
                     tempDiv.innerHTML = rawDescription;
-                    // Remove image elements from text calculations
                     const embeddedImg = tempDiv.querySelector('img');
                     if (embeddedImg) embeddedImg.remove();
                     const cleanDescription = tempDiv.textContent || tempDiv.innerText || '';
@@ -333,7 +321,6 @@
                     return { 
                         title, 
                         description: cleanDescription.trim(), 
-                        link, 
                         imageUrl, 
                         pubDate, 
                         category, 
@@ -341,11 +328,11 @@
                     };
                 });
 
-                if (stories.length === 0) throw new Error("No entries found");
+                if (stories.length === 0) throw new Error("No items parsed");
                 
                 initStories();
             } catch (error) {
-                console.error("Error parsing feed:", error);
+                console.error("Feed error:", error);
                 document.getElementById('loader').innerText = "Fehler beim Laden des Feeds.";
             }
         }
