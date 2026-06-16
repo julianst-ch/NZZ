@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NZZ News Stories - Kristallklar</title>
+    <title>NZZ News Stories - Dynamic Typography</title>
     <style>
         :root {
             --bg-color: #030914;
@@ -32,7 +32,7 @@
             overflow: hidden;
         }
 
-        /* Perfektes 9:16 Verhältnis für Full-HD-Bildschirme */
+        /* Perfektes 9:16 Verhältnis + Container-Definition für dynamische Schrift */
         .story-wrapper {
             position: relative;
             width: 100vw;
@@ -45,6 +45,9 @@
             flex-direction: column;
             overflow: hidden;
             box-shadow: 0 0 40px rgba(0,0,0,0.85);
+            
+            /* Aktiviert Container-Units (cqw) für alle Elemente im Inneren */
+            container-type: inline-size;
         }
 
         /* Fortschrittsbalken oben */
@@ -91,7 +94,8 @@
         .meta-info {
             display: flex;
             align-items: center;
-            font-size: 1.2rem;
+            /* Dynamischer Header-Text */
+            font-size: clamp(0.95rem, 4cqw, 1.2rem);
             font-weight: 600;
             letter-spacing: 0.5px;
         }
@@ -109,7 +113,7 @@
             background: none;
             border: none;
             color: #fff;
-            font-size: 2rem;
+            font-size: clamp(1.5rem, 6cqw, 2rem);
             cursor: pointer;
             opacity: 0.7;
             line-height: 1;
@@ -199,7 +203,8 @@
 
         .ticker-badge {
             align-self: flex-start;
-            font-size: 0.85rem;
+            /* Dynamischer Live-Badge */
+            font-size: clamp(0.7rem, 3cqw, 0.85rem);
             text-transform: uppercase;
             font-weight: 800;
             letter-spacing: 1.5px;
@@ -207,23 +212,28 @@
             margin-bottom: 3%;
         }
 
+        /* DYNAMISCHE ÜBERSCHRIFT */
         .story-title {
             font-family: Georgia, serif;
-            font-size: 2.1rem;
-            line-height: 1.35;
+            /* Skaliert flüssig zwischen 1.5rem auf kleinen Handys und 2.3rem auf großen Displays */
+            font-size: clamp(1.5rem, 7.5cqw, 2.3rem);
+            line-height: 1.3;
             font-weight: 600;
             margin-bottom: 4%;
             color: var(--text-color);
         }
 
+        /* DYNAMISCHER UNTERTITEL / BESCHREIBUNG */
         .story-description {
-            font-size: 1.25rem;
-            line-height: 1.65;
+            /* Skaliert flüssig zwischen 1rem und 1.3rem */
+            font-size: clamp(1rem, 4.5cqw, 1.3rem);
+            line-height: 1.6;
             color: var(--text-muted);
         }
 
         .story-author {
-            font-size: 0.95rem;
+            /* Dynamische Autorenzeile */
+            font-size: clamp(0.8rem, 3.5cqw, 0.95rem);
             color: var(--text-muted);
             margin-top: auto;
             padding-top: 15px;
@@ -355,11 +365,8 @@
                     }
                 }
 
-                // KORRIGIERTE HIGH-RES LOGIK FÜR DAS NZZ IMAGE-CDN
                 if (imageUrl && imageUrl.includes('nzz.ch')) {
-                    // Wir werfen alle standardmäßig drosselnden Parameter ab
                     const baseUrl = imageUrl.split('?')[0];
-                    // Wir fordern eine HD-Breite an und nutzen 'fit=bounds&auto=webp' für die Skalierung
                     imageUrl = `${baseUrl}?width=1440&fit=bounds&quality=85&auto=webp`;
                 }
 
