@@ -6,7 +6,7 @@
     <title>NZZ News Stories - Universal Playout</title>
     <style>
         :root {
-            --bg-color: #050b14; /* Originaler, tiefer NZZ-Blauton */
+            --bg-color: #050b14; 
             --text-color: #ffffff;
             --text-muted: #a2aebf;
             --accent-blue: #2e96ff;
@@ -32,7 +32,7 @@
             overflow: hidden;
         }
 
-        /* Perfekte 9:16 Box für ALLE Geräte */
+        /* Perfekte 9:16 Box */
         .story-wrapper {
             position: relative;
             width: 100vw;
@@ -47,7 +47,7 @@
             box-shadow: 0 0 40px rgba(0,0,0,0.85);
         }
 
-        /* Fortschrittsbalken oben */
+        /* Progress Bar */
         .progress-container {
             position: absolute;
             top: 2.5vh;
@@ -74,7 +74,7 @@
             background-color: #fff;
         }
 
-        /* Header (Kategorie & Zeit) */
+        /* Header */
         .story-header {
             position: absolute;
             top: 4.5vh;
@@ -97,27 +97,11 @@
             letter-spacing: 0.3px;
         }
 
-        .category {
-            color: #fff;
-        }
+        .category { color: #fff; }
+        .time-ago { color: var(--text-muted); margin-left: 8px; font-weight: 400; }
+        .close-btn { background: none; border: none; color: #fff; font-size: 3.5vh; cursor: pointer; opacity: 0.6; line-height: 1; }
 
-        .time-ago {
-            color: var(--text-muted);
-            margin-left: 8px;
-            font-weight: 400;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 3.5vh;
-            cursor: pointer;
-            opacity: 0.6;
-            line-height: 1;
-        }
-
-        /* Touch-/Klick-Zonen für manuelle Navigation */
+        /* Navigation */
         .nav-zones {
             position: absolute;
             top: 0;
@@ -127,15 +111,10 @@
             z-index: 5;
             display: flex;
         }
-
         .zone-left { width: 33%; height: 100%; }
         .zone-right { width: 67%; height: 100%; }
 
-        .slides-container {
-            width: 100%;
-            height: 100%;
-            position: relative;
-        }
+        .slides-container { width: 100%; height: 100%; position: relative; }
 
         .slide {
             position: absolute;
@@ -150,10 +129,7 @@
             flex-direction: column;
         }
 
-        .slide.active {
-            opacity: 1;
-            visibility: visible;
-        }
+        .slide.active { opacity: 1; visibility: visible; }
 
         /* Bild fix bei 50% */
         .image-container {
@@ -163,11 +139,7 @@
             background-color: #000;
         }
 
-        .story-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        .story-img { width: 100%; height: 100%; object-fit: cover; }
 
         .image-container::after {
             content: '';
@@ -200,22 +172,19 @@
             margin-bottom: 1.2vh;
         }
 
-        /* Titel: Startet groß, maximal 4 Zeilen über Line-Clamp */
+        /* Titel: Festes Line-Height für präzise JS-Berechnung */
         .story-title {
             font-family: Georgia, serif;
             font-size: 4.2vh; 
-            line-height: 1.22;
+            line-height: 1.25; /* WICHTIG: Entspricht dem Faktor 1.25 im JS */
             font-weight: 700;
             margin-bottom: 1.8vh;
             color: var(--text-color);
             letter-spacing: -0.3px;
-            display: -webkit-box;
-            -webkit-line-clamp: 4;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+            word-break: break-word; /* Verhindert das Herausragen extrem langer Wörter */
         }
 
-        /* Beschreibung: Startet groß, ebenfalls maximal 4 Zeilen */
+        /* Beschreibung: Strikt limitiert auf maximal 4 Zeilen */
         .story-description {
             font-size: 2.3vh; 
             line-height: 1.50;
@@ -445,34 +414,37 @@
             setTimeout(fetchFeed, stories.length * STORY_DURATION);
         }
 
-        // PROPORTIONALE DYNAMISCHE SCHRIFTANPASSUNG MIT DEFALUT-GROSSEN
+        // SCHUSSFESTE ZEILENBERECHNUNG FÜR DEN TITEL (Maximal 5 Zeilen)
         function adjustFontSize(slide) {
-            const content = slide.querySelector('.content-container');
             const titleEl = slide.querySelector('.story-title');
-            const descEl = slide.querySelector('.story-description');
-            if (!content || !titleEl) return;
+            if (!titleEl) return;
 
-            // 1. IMMER mit deinen maximalen Wunschgrößen starten
+            // 1. Reset auf deine gewollte, markante Ausgangsgrösse
             let titleSize = 4.2; 
-            let descSize = 2.3;
-            
             titleEl.style.fontSize = titleSize + 'vh';
-            if (descEl) {
-                descEl.style.fontSize = descSize + 'vh';
-            }
 
             let safetyCounter = 0;
 
-            // 2. Falls beide Texte zusammen bei 4 Zeilen das Feld sprengen, 
-            // verkleinern wir beide parallel und gleichmäßig, bis es perfekt passt.
-            while (content.scrollHeight > content.clientHeight && safetyCounter < 25) {
-                safetyCounter++;
-                titleSize -= 0.12;
-                descSize -= 0.06;
+            // 2. Loop prüft exklusiv die Zeilenanzahl des Titels
+            while (safetyCounter < 40) {
+                const computedStyle = window.getComputedStyle(titleEl);
+                const fontSizePx = parseFloat(computedStyle.fontSize);
+                
+                // Da CSS line-height auf 1.25 gesetzt ist, wissen wir mathematisch exakt,
+                // wie hoch eine einzelne Zeile in Pixeln sein MUSS.
+                const lineExpectedHeight = fontSizePx * 1.25; 
+                const currentTitleHeight = titleEl.offsetHeight;
+                
+                // Berechne die reellen Zeilen des Titels (+1px Toleranz für Subpixel-Rendering)
+                const currentLines = Math.ceil((currentTitleHeight - 1) / lineExpectedHeight);
 
-                titleEl.style.fontSize = titleSize + 'vh';
-                if (descEl) {
-                    descEl.style.fontSize = descSize + 'vh';
+                // Wenn der Titel mehr als 5 Zeilen benötigt, verkleinern wir die Schrift
+                if (currentLines > 5 && titleSize > 1.8) {
+                    titleSize -= 0.1;
+                    titleEl.style.fontSize = titleSize + 'vh';
+                    safetyCounter++;
+                } else {
+                    break; // Perfekt, der Titel hat maximal 5 Zeilen!
                 }
             }
         }
